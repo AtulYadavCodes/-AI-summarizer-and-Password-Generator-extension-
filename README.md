@@ -92,9 +92,6 @@ project/
 
 <img src="Screenshot 2025-08-12 233008.png" alt="Password without feedback" width="600" />
 
-### AI Summary for Website
-
-<img src="Sandbox:/mnt/data/Screenshot%202025-08-12%20233218.png" alt="Website Summary" width="600" />
 
 ---
 
