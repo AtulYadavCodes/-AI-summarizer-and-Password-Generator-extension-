@@ -1,55 +1,111 @@
-import { useState,useCallback,useEffect, useRef } from "react";
-function App(){
-  let [length,setLength]=useState(4);
-  let refe=useRef(null);
-  let [password,setPassword]=useState("");
-  let [numbers,setnumbers]=useState(false);
-  let [symbols,setSymbols]=useState(false);
-  let [visible,setvisibility]=useState(false);
-  let passwordGenerator=()=>{
-  let pass="";
-  let Str="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-  if(numbers){Str= Str + "0123456789";}
-  if(symbols){Str= Str + "!@#$%^&*()_+[]{}|;:,.<>?";}
-  for(let i=0;i<length;i++){
-    pass=pass+Str.charAt(Math.floor(Math.random()* Str.length));
-  }
-  setPassword(pass);
+import { useState, useEffect, useRef } from "react";
+import axios from 'axios';
+
+export default function App() {
+  let [length, setLength] = useState(4);
+  let [password, setPassword] = useState("");
+  let [numbers, setnumbers] = useState(false);
+  let [symbols, setSymbols] = useState(false);
+  let [visible, setvisibility] = useState(false);
+  let [aifeedback, setAifeedback] = useState("");
+  let [leakcheck, setLeakcheck] = useState(" Is this password pawned? copy to check");
+
+  let url='';
+  let refe = useRef(null);
+chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
+     url = tabs[0].url;
+})
+  let passwordGenerator = () => {
+    let pass = "";
+    let Str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    if (numbers) Str += "0123456789";
+    if (symbols) Str += "!@#$%^&*()_+[]{}|;:,.<>?";
+    for (let i = 0; i < length; i++) {
+      pass += Str.charAt(Math.floor(Math.random() * Str.length));
+    }
+    setPassword(pass);
   };
 
-  let copie=()=>{
+  let copie = () => {
     refe.current.select();
     navigator.clipboard.writeText(password);
     setvisibility(true);
-    setTimeout(() => {
-      setvisibility(false);
-    }, 500);
-  }
+    setTimeout(() => setvisibility(false), 500);
+  };
 
-  useEffect(()=>{
+  useEffect(() => {
     passwordGenerator();
-  },[length,numbers,symbols]);
+  }, [length, numbers, symbols]);
 
-  return <>
-  <div className="h-screen w-screen flex justify-center items-center bg-gray-100">
-    <div className="h-[50vh] w-[50vw] rounded-2xl bg-gray-300 drop-shadow-2xl flex flex-row justify-center items-center">
-      <div className="h-full w-full flex flex-col justify-center items-center">
-        <div className="relative flex flex-row"><input className="h-20 w-100 bg-transparent rounded-2xl border-1 text-xl"  ref={refe} type="text" value={password}/><button onClick={copie} className="h-20 w-20 bg-green-800 absolute right-[0.1px] text-white top-[0.1px] rounded-r-2xl hover:text-2xl">copy</button></div>
-        <label className="text-2xl font-bold text-green-800" style={{visibility:visible?"visible":"hidden"}}>copied</label>
-      </div> 
-      <div className="h-full w-60 rounded-r-2xl  bg-amber-50 flex flex-col justify-center items-center">
-        <input type="range" name="range" max={100} min={4} value={length} onChange={(e)=>setLength(e.target.value)} defaultValue={4}/>
-        <label >range={length}</label>
-        <hr className="w-full border-0.5 border-gray-300 m-10"/>
-        <input  onChange={(e)=>setnumbers(e.target.checked)} type="checkbox" name="numbers " defaultChecked={numbers} placeholder="numbers"/>
-        <label >numbers</label>
-        <hr className="w-full border-0.5 border-gray-300 m-10"/>
-        <input onChange={(e)=>setSymbols(e.target.checked)} type="checkbox" name="symbols" defaultChecked={symbols} placeholder="symbols"/>
-        <label >symbols</label>
+  return (
+    <div className="w-[400px] h-[600px] flex flex-col bg-gradient-to-b from-gray-50 to-gray-200 p-4 rounded-lg shadow-lg overflow-hidden">
+      {/* Title */}
+      <h1 className="text-xl font-bold text-gray-800 text-center mb-4">🔐 AI summarizer and Password Generator</h1>
+
+      {/* Password box */}
+      <div className="flex gap-2 mb-2">
+        <input
+          ref={refe}
+          type="text"
+          value={password}
+          readOnly
+          className="flex-grow border border-gray-300 rounded-lg px-3 py-2 text-lg bg-white shadow-sm focus:outline-none"
+        />
+        <button
+          onClick={copie}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-md"
+        >
+          Copy
+        </button>
+      </div>
+      {visible && <p className="text-green-600 text-xs mb-3">Copied!</p>}
+
+      {/* Settings */}
+      <div className="bg-white p-3 rounded-lg shadow mb-3">
+        <label className="block font-semibold mb-1">Length: {length}</label>
+        <input
+          type="range"
+          min={4}
+          max={32}
+          value={length}
+          onChange={(e) => setLength(e.target.value)}
+          className="w-full accent-blue-500"
+        />
+        <div className="flex gap-4 mt-3">
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={numbers}
+              onChange={(e) => setnumbers(e.target.checked)}
+              className="accent-blue-500"
+            />
+            Numbers
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={symbols}
+              onChange={(e) => setSymbols(e.target.checked)}
+              className="accent-blue-500"
+            />
+            Symbols
+          </label>
+        </div>
+      </div>
+
+     
+      {/* AI Feedback */}
+      <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg flex-1 overflow-auto shadow-inner">
+        <button
+          onClick={() => axios.post("https://ai-summarizer-and-password-generator.onrender.com/backend",url,{headers:{"Content-Type":"text/plain"}}).then((response)=>setAifeedback(response.data))}
+          className="mb-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded shadow"
+        >
+          Get AI Feedback of this Web
+        </button>
+        <p className="text-sm text-gray-700 whitespace-pre-line">
+          {aifeedback || "No feedback yet. Click the button to analyze your password."}
+        </p>
       </div>
     </div>
-  </div>
-  </>
-
+  );
 }
-export default App;
