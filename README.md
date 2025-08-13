@@ -86,11 +86,11 @@ project/
 
 ### Password Generated with AI Feedback
 
-<img src="Screenshot 2025-08-12 232907.png" alt="Password with feedback" width="600" />
+<img src="Screenshot 2025-08-12 233218.png" alt="Password with feedback" width="600" />
 
 ### Password Generated without Feedback
 
-<img src="Sandbox:/mnt/data/Screenshot%202025-08-12%20233135.png" alt="Password without feedback" width="600" />
+<img src="Screenshot 2025-08-12 233008.png" alt="Password without feedback" width="600" />
 
 ### AI Summary for Website
 
