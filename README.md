@@ -100,14 +100,6 @@ project/
 
 ## 🏃 How to Run
 
-### 1️⃣ Start Backend
-
-```bash
-cd backend
-npm install
-node index.js
-```
-
 ### 2️⃣ Build Frontend (React Popup)
 
 ```bash
