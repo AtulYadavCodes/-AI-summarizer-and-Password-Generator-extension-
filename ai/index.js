@@ -29,7 +29,8 @@ main();
 app.get("/",(req,res)=>{
     res.send("Hello from the backend");
 });
-app.listen(4000,()=>
+const port = process.env.PORT || 4000;
+app.listen(port,()=>
     console.log("Server is running on port 4000")
 );
 
